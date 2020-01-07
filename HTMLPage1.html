@@ -1,0 +1,150 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        body {
+            background-color: lightgray;
+        }
+
+        #title {
+            font-size: 36px;
+            text-align: center;
+            color: navy;
+        }
+
+        a {
+            text-align: center;
+            margin-left: 45%;
+        }
+
+        #tooltip {
+            position: absolute;
+            padding: 5px;
+            background: white;
+            border: 1px solid red;
+        }
+    </style>
+
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.14/d3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
+</head>
+
+
+<body>
+    <div class='container' id="graph">
+        <h1 id='title'>United States GDP</h1>
+        <div class="aboutChart">
+            <a href='http://www.bea.gov/national/pdf/nipaguid.pdf' target="_blank">more information</a>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+
+
+        function Draw(dataset) {
+            
+            var marginTop=50, 
+                marginBottom=50,
+                marginLeft=100, 
+                marginRight=20,
+                w= 800,
+                h= 400
+
+            var size = dataset.length;
+
+            //The next section declares the function to determine positioning in the x and y domain
+            var minDate = dataset[0][0].substr(0, 4);
+            minDate = new Date(minDate);
+            var maxDate = dataset[size - 1][0].substr(0, 4);
+            maxDate = new Date(maxDate);
+
+            var xAxisScale = d3.time.scale()
+                 .domain([minDate, maxDate])
+                 .range([0, w]);
+            
+            var yAxisScale = d3.scale.linear()
+                 .domain([0, d3.max(dataset, function (d) {
+                    return d[1];
+                    })
+                  ])
+                 .range([h, 0]);
+
+            var xAxis = d3.svg.axis().scale(xAxisScale).orient("bottom");
+        
+            var yAxis = d3.svg.axis().scale(yAxisScale).orient("left");
+
+            var tooltip = d3.select('body').append('div')
+               .style({
+                   'position': 'absolute',
+                   'padding': '4px',
+                   'background': '#fff',
+                   'border': '1px solid #000',
+                   'color': '#000'
+               });
+
+            
+         
+            var svg = d3.select("#graph")
+                    .append("svg")
+                    .attr("width", w + marginLeft + marginRight)
+                    .attr("height", h + marginTop + marginBottom)
+                    .append("g")
+                    .attr("transform", "translate(" + marginLeft + "," + marginTop + ")");
+
+           
+            svg.selectAll("bar")
+                 .data(dataset)
+                 .enter()
+                 .append("rect")
+                 .style("fill", "navy")
+                 .attr({
+                     x: function (d, i) { return (i * (w / size)); },
+                     y: function (d) { return yAxisScale(d[1]); },
+                     width: (w/ size),
+                     height: function (d) { return h - yAxisScale(d[1]); },
+                 })
+            ;
+
+   
+            svg.append("g")
+                 .attr("class", "x axis")
+                 .attr("transform", "translate(0, " + h + ")")
+                 .call(xAxis)
+                 .selectAll("text")
+                 .style("text-anchor", "end")
+                 .attr("dx", "-0.5em")
+                 .attr("dy", "-.55em")
+                 .attr("y", 30)
+                 .attr("transform", "rotate(-45)");
+          
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", -85)
+                .attr("dy", "0.8em");
+              
+        }
+
+  
+
+            d3.json("https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json", function (data) {
+
+           var dataset = data.data;
+           Draw(dataset);
+           
+
+        });
+
+
+
+
+
+</script>
