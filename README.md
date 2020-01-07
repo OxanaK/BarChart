@@ -1,11 +1,10 @@
 # BarChart
-designing and developing a singl web application for making funny tunes by pressing keys on the keyboard in different sequences,
-works for different screen sizes
+designing and developing a simple web page and visualizing data with a bar chart
 
 Try it! ----> https://codepen.io/oxana-krisyuk/pen/bGNYjde
 
 ## Technology:
-JavaScript, HTML, CSS, D3.js
+JavaScript, HTML5, CSS, D3.js
 
 ## Images: 
 
