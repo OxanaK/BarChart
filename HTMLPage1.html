@@ -47,48 +47,48 @@
 <script>
 
 
-        function Draw(dataset) {
+        function DrawGraph(dataset) {
             
             var marginTop=50, 
                 marginBottom=50,
                 marginLeft=100, 
                 marginRight=20,
                 w= 800,
-                h= 400
+                h= 400;
 
             var size = dataset.length;
 
-             var minDate = dataset[0][0];
+         
+            var minDate = dataset[0][0];
             minDate = new Date(minDate);
             var maxDate = dataset[size - 1][0];
             maxDate = new Date(maxDate);
 
-            var xAxisScale = d3.time.scale()
+            var xScale = d3.time.scale()
                  .domain([minDate, maxDate])
-                 .range([0, w]);
+                 .range([-6, w]);
             
-            var yAxisScale = d3.scale.linear()
+            var yScale = d3.scale.linear()
                  .domain([0, d3.max(dataset, function (d) {
                     return d[1];
                     })
                   ])
-                 .range([h, 0]);
+                 .range([h, 0]) ;
 
-            var xAxis = d3.svg.axis().scale(xAxisScale).orient("bottom");
+            var xAxis = d3.svg.axis()
+            .scale(xScale)
+            .orient("bottom");
+          
         
-            var yAxis = d3.svg.axis().scale(yAxisScale).orient("left");
+            var yAxis = d3.svg.axis()
+            .scale(yScale)
+            .orient("left");
 
             var tooltip = d3.select('body').append('div')
-               .style({
-                   'position': 'absolute',
-                   'padding': '4px',
-                   'background': '#fff',
-                   'border': '1px solid #000',
-                   'color': '#000'
-               });
+               .attr("id","tooltip")
+            .style("visibility", "hidden");
 
-            
-         
+                  
             var svg = d3.select("#graph")
                     .append("svg")
                     .attr("width", w + marginLeft + marginRight)
@@ -97,47 +97,61 @@
                     .attr("transform", "translate(" + marginLeft + "," + marginTop + ")");
 
            
-            svg.selectAll("bar")
-                 .data(dataset)
+            svg.selectAll("rect")
+                  .data(dataset)
                  .enter()
                  .append("rect")
-                 .style("fill", "navy")
+                 .attr("class", "bar")
+                 .attr("data-date", (d) => (d[0]))
+                  .attr("data-gdp", (d) => (d[1]))
+                  .style("fill", "navy")
                  .attr({
                      x: function (d, i) { return (i * (w / size)); },
-                     y: function (d) { return yAxisScale(d[1]); },
-                     width: (w/ size),
-                     height: function (d) { return h - yAxisScale(d[1]); },
+                     y: function (d) { return yScale(d[1]); },
+                     width: (w/size),
+                     height: function (d) { return h - yScale(d[1]); },
                  })
-            ;
-
-   
+                  .on("mouseenter", function (d, i) {          
+                    tooltip.style("visibility", "visible")
+                      .attr("data-date", d[0])
+                      .html("Date: " +  d[0].substr(0,7) +"<br>" + "GDP: $" + d[1]+" billions")
+                      .style('left', d3.event.pageX + 10+ 'px')
+                      .style('top', d3.event.pageY +-50+ 'px')
+              
+                                   
+                  })
+                  .on("mouseleave", function (d, i) {
+                    tooltip.style("visibility", "hidden")
+                  });
+ 
             svg.append("g")
                  .attr("class", "x axis")
+                .attr("id", "x-axis")
                  .attr("transform", "translate(0, " + h + ")")
                  .call(xAxis)
                  .selectAll("text")
-                 .style("text-anchor", "end")
-                 .attr("dx", "-0.5em")
-                 .attr("dy", "-.55em")
-                 .attr("y", 30)
-                 .attr("transform", "rotate(-45)");
-          
+                 .attr("y", 20);
+                 
             svg.append("g")
                 .attr("class", "y axis")
+                .attr("id", "y-axis")
                 .call(yAxis)
                 .append("text")
                 .attr("transform", "rotate(-90)")
-                .attr("y", -85)
-                .attr("dy", "0.8em");
+                .attr("y", 20)
+               .style("text-anchor", "end")
+                .text("US Gross Domestic Product, billions $");  
+                
               
         }
 
-  
-           d3.json('https://raw.githubusercontent.com/OxanaK/BarChart/master/data.json', function (data) {
+            d3.json("https://raw.githubusercontent.com/OxanaK/BarChart/master/data.json", function (data) {
 
            var dataset = data.data;
-           Draw(dataset);
-           
+           DrawGraph(dataset);
+         
+
         });
+
 
 </script>
