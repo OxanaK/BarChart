@@ -58,10 +58,9 @@
 
             var size = dataset.length;
 
-            //The next section declares the function to determine positioning in the x and y domain
-            var minDate = dataset[0][0].substr(0, 4);
+             var minDate = dataset[0][0];
             minDate = new Date(minDate);
-            var maxDate = dataset[size - 1][0].substr(0, 4);
+            var maxDate = dataset[size - 1][0];
             maxDate = new Date(maxDate);
 
             var xAxisScale = d3.time.scale()
@@ -134,17 +133,11 @@
         }
 
   
-
-            d3.json("https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json", function (data) {
+           d3.json('https://raw.githubusercontent.com/OxanaK/BarChart/master/data.json', function (data) {
 
            var dataset = data.data;
            Draw(dataset);
            
-
         });
-
-
-
-
 
 </script>
